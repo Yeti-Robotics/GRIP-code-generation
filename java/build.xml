@@ -14,7 +14,7 @@
     <property name="tmp.dir"        value="${build.dir}/tmp"/>
     <property name="class.dir"      value="${tmp.dir}/jar"/>
     <property name="jar.file"       value="${build.dir}/${ant.project.name}.jar"/>
-    <property name="main-class"     value="grip.sample1.FindRedAreasApp"/>
+    <property name="main-class"     value="grip.sample1.FindRedContoursApp"/>
 
     <path id="libraries.path">    
     	<fileset file="${env.OPENCV_JAR}" />
