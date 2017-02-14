@@ -12,6 +12,7 @@ public class FindRedContoursApp {
 	// Camera settings
 	static final int IMG_WIDTH = 640;
 	static final int IMG_HEIGHT = 480;
+	static final String IP_CAMERA_ADDRESS = "http://raspberrypi.local:1180/?action=stream";
 	static double exposure = -1.0;
 
 	public static void main(String[] args) {
@@ -21,7 +22,7 @@ public class FindRedContoursApp {
 		NetworkTable table = NetworkTable.getTable("ContoursDetected");
 
 		// Creating camera object
-		VideoCapture camera = new VideoCapture(0);
+		VideoCapture camera = new VideoCapture(IP_CAMERA_ADDRESS);
 		camera.set(Videoio.CAP_PROP_FRAME_WIDTH, IMG_WIDTH);
 		camera.set(Videoio.CAP_PROP_FRAME_HEIGHT, IMG_HEIGHT);
 		if (exposure > -1.0) {
