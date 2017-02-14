@@ -3,5 +3,10 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/opencv-3.2.0"/>
+	<classpathentry kind="lib" path="lib/networktables-desktop.jar" sourcepath="lib/networktables-desktop-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/GRIP-code-generation/lib/networktables-desktop-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

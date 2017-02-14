@@ -1,33 +1,54 @@
 package grip.sample1;
 
-import static edu.wpi.first.wpilibj.vision.GripRunner.makeCamera;
-import static edu.wpi.first.wpilibj.vision.GripRunner.makeWindow;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.videoio.VideoCapture;
+import org.opencv.videoio.Videoio;
 
-import edu.wpi.first.wpilibj.vision.GripRunner;
-import edu.wpi.first.wpilibj.vision.GripRunner.Listener;
-import edu.wpi.first.wpilibj.vision.VideoViewer;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class FindRedContoursApp {
 
-	static final int IMG_WIDTH = 320;
-	static final int IMG_HEIGHT = 240;
-
-	final VideoViewer window;
-	final Listener<RedContourVisionPipeline> listener;
-	final GripRunner<RedContourVisionPipeline> gripRunner;
-
-	public FindRedContoursApp() {
-		this.window = makeWindow("GRIP", IMG_WIDTH, IMG_HEIGHT);
-		this.listener = (this.window != null) ? (processor -> {
-			window.imshow(processor.rgbThresholdOutput());
-		}) : null;
-		this.gripRunner = new GripRunner<>(makeCamera(0, IMG_WIDTH, IMG_HEIGHT, -1.0), new RedContourVisionPipeline(),
-				listener);
-	}
+	// Camera settings
+	static final int IMG_WIDTH = 640;
+	static final int IMG_HEIGHT = 480;
+	static double exposure = -1.0;
 
 	public static void main(String[] args) {
-		FindRedContoursApp app = new FindRedContoursApp();
-		app.gripRunner.runForever();
+		RedContourVisionPipeline pipeline = new RedContourVisionPipeline();
+		NetworkTable.setClientMode();
+		NetworkTable.setIPAddress("localhost");
+		NetworkTable table = NetworkTable.getTable("ContoursDetected");
+
+		// Creating camera object
+		VideoCapture camera = new VideoCapture(0);
+		camera.set(Videoio.CAP_PROP_FRAME_WIDTH, IMG_WIDTH);
+		camera.set(Videoio.CAP_PROP_FRAME_HEIGHT, IMG_HEIGHT);
+		if (exposure > -1.0) {
+			System.out.println("\t" + -1.0);
+			camera.set(Videoio.CAP_PROP_AUTO_EXPOSURE, 0);
+			camera.set(Videoio.CAP_PROP_EXPOSURE, exposure);
+		}
+		if (!camera.isOpened()) {
+			throw new RuntimeException("Camera will not open");
+		}
+
+		// Never-ending processing loop
+		while (true) {
+			Mat mat = new Mat();
+			camera.read(mat);
+			pipeline.process(mat);
+			System.out.println(pipeline.convexHullsOutput().size() + " contours found");
+			if (pipeline.convexHullsOutput().size() > 0) {
+				Point[] points = pipeline.convexHullsOutput().get(0).toArray();
+				for (int i = 0; i < points.length; i++) {
+					System.out.print(points[i] + ", ");
+				}
+				System.out.println();
+				table.putNumber("pixelX", points[0].x);
+				table.putNumber("pixelY", points[0].y);
+			}
+		}
 	}
 
 }
